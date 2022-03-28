@@ -3,8 +3,18 @@ task:
     dockerfile: .ci/Dockerfile
 
   matrix:
+    - name: Build
+      only_if: ${GITHUB_USER} != "" && ${GITHUB_PAT} != "" && ${BASEROM_REPO} != ""
+      get_baseroms_script:
+        - git clone https://${GITHUB_USER}:${GITHUB_PAT}@github.com/${BASEROM_REPO}.git /tmp/baseroms
+        - cp /tmp/baseroms/* .
+      build_script:
+        - make CPP=cpp -j
+
     - name: Check
       only_if: ${GITHUB_USER} != "" && ${GITHUB_PAT} != "" && ${BASEROM_REPO} != ""
+      depends_on:
+        - Build
       get_baseroms_script:
         - git clone https://${GITHUB_USER}:${GITHUB_PAT}@github.com/${BASEROM_REPO}.git /tmp/baseroms
         - cp /tmp/baseroms/* .
